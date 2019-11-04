@@ -1,0 +1,28 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@model CourseCommentViewModel
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    Layout = null;
+}
+
+<div id="comment-content">
+    <div>Write a Comment: @Html.ValidationSummary()</div>
+    <form class="ajax-form" action="/Comment/AddComment" target="comment-content" method="post">
+        @Html.TextArea("Comment", "", new { style = "width:100%; min-height: 100px" }) <br/>
+        @Html.Hidden("CourseId", Model.CourseId)
+        <input type="submit" class="btn btn-primary" value="Submit" />
+    </form>
+
+    @{
+        foreach (UserComments uc in Model.CourseComments)
+        {
+            var username = await UserManager.FindByIdAsync(uc.UserId);
+            <div class="comment-container">
+                <div class="comment-user">@username.UserName<span class="comment-date">@uc.CreateDate</span></div>
+                <div class="comment-message">@uc.Comment</div>
+            </div>
+        }
+    }
+</div>

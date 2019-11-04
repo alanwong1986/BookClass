@@ -1,0 +1,53 @@
+﻿@model ManageCategoryViewModel
+@{
+    Layout = null;
+}
+
+<script>
+    $(document).ready(function () {
+        $(".btn-delete").click(function () {
+            var confirm = window.confirm("Are you sure to delete?");
+            if (confirm) {
+                $.post("@Url.Action("DeleteCategory", "Admin")/" + $(this).data("cid"))
+                    .done(function (e) {
+                        if (e.success == "true") {
+                            messageBox("Delete Success");
+                            refreshList();
+                        } else {
+                            messageBox(e.message);
+                        }
+                    });
+            }
+        });
+        rebindAjaxGetPartial();
+    });
+</script>
+
+<table class="table table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Icon</th>
+            <th scope="col">Modify DateTime</th>
+            <th scope="col">Create DateTime</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    @foreach (Categorys cat in Model.Categorys)
+    {
+        <tr>
+            <td scope="col">@cat.Name</td>
+            <td scope="col">@cat.Icon</td>
+            <td scope="col">@(cat.LastModifty.HasValue ? cat.LastModifty.Value.ToString("yyyy/MM/dd HH:mm:ss") : "")</td>
+            <td scope="col">@cat.CreateDate.ToString("yyyy/MM/dd HH:mm:ss")</td>
+            <td scope="col">
+                <button type="button" class="btn btn-primary fa fa-pencil get-partial" stlye="margin-left: 40px" href="/Admin/CategoryEditor/@cat.Id" target="data-modal-content" modal="data-modal"></button>
+                <button type="button" class="btn btn-danger fa fa-remove btn-delete" stlye="margin-left: 40px" data-cid="@cat.Id"></button>
+            </td>
+        </tr>
+    }
+</table>
+
+<div class="row">
+    <button type="button" class="btn btn-success fa fa-plus get-partial" style="margin-left: 20px" href="/Admin/CategoryEditor" target="data-modal-content" modal="data-modal"></button>
+</div>

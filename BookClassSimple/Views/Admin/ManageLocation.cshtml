@@ -1,0 +1,34 @@
+﻿@{
+    ViewData["Title"] = "List of Location";
+}
+
+<script>
+    $(document).ready(function () {
+        refreshList();
+    });
+
+    function refreshList() {
+        $.get("@Url.Action("RefreshLocationList", "Admin")").done(function (data) {
+            $("#list-container").html(data); 
+        });
+    }
+</script>
+
+<div class="container">
+    <div class="row">
+        <div>
+            <h1>List of Location</h1>
+        </div>
+        <div class="col-md-12" id="list-container">
+        </div>
+
+        <div id="data-modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div id="data-modal-content" class="modal-content">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

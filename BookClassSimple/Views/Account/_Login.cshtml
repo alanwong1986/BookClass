@@ -1,0 +1,27 @@
+﻿@model AccountLoginViewModel
+
+<div class="modal-title">Login</div>
+
+<form class="ajax-form" action="/Account/UserLogin" target="account-modal-content" method="post">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary()
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">@@</span>
+        </div>
+        @Html.TextBoxFor(vm => vm.Email, new { @class = "form-control", placeholder = Html.DisplayNameFor(vm => vm.Email) })
+    </div>
+    <br />
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <div class="input-group-text">
+                <span class="fa fa-lock"></span>
+            </div>
+        </div>
+        @Html.PasswordFor(vm => vm.Password, new { @class = "form-control", placeholder = Html.DisplayNameFor(vm => vm.Password) })
+    </div>
+
+    <br />
+    <input type="submit" class="btn btn-primary" value="Login" />
+</form>
+

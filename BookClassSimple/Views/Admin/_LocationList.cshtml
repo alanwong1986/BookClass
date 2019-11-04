@@ -1,0 +1,51 @@
+﻿@model ManageLocationViewModel
+@{
+    Layout = null;
+}
+
+<script>
+    $(document).ready(function () {
+        $(".btn-delete").click(function () {
+            var confirm = window.confirm("Are you sure to delete?");
+            if (confirm) {
+                $.post("@Url.Action("DeleteLocation", "Admin")/" + $(this).data("cid"))
+                    .done(function (e) {
+                        if (e.success == "true") {
+                            messageBox("Delete Success");
+                            refreshList();
+                        } else {
+                            messageBox(e.message);
+                        }
+                    });
+            }
+        });
+        rebindAjaxGetPartial();
+    });
+</script>
+
+<table class="table table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Address</th>
+            <th scope="col">Modify DateTime</th>
+            <th scope="col">Create DateTime</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    @foreach (Location loc in Model.Location)
+    {
+        <tr>
+            <td scope="col">@loc.Address</td>
+            <td scope="col">@(loc.LastModifty.HasValue ? loc.LastModifty.Value.ToString("yyyy/MM/dd HH:mm:ss") : "")</td>
+            <td scope="col">@loc.CreateDate.ToString("yyyy/MM/dd HH:mm:ss")</td>
+            <td scope="col">
+                <button type="button" class="btn btn-primary fa fa-pencil get-partial" stlye="margin-left: 40px" href="/Admin/LocationEditor/@loc.Id" target="data-modal-content" modal="data-modal"></button>
+                <button type="button" class="btn btn-danger fa fa-remove btn-delete" stlye="margin-left: 40px" data-cid="@loc.Id"></button>
+            </td>
+        </tr>
+    }
+</table>
+
+<div class="row">
+    <button type="button" class="btn btn-success fa fa-plus get-partial" style="margin-left: 20px" href="/Admin/LocationEditor" target="data-modal-content" modal="data-modal"></button>
+</div>

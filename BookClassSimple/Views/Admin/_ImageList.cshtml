@@ -1,0 +1,50 @@
+﻿@model ManageImageViewModel
+@{
+    Layout = null;
+}
+
+<script>
+    $(document).ready(function () {
+        $(".btn-delete").click(function () {
+            var confirm = window.confirm("Are you sure to delete?");
+            if (confirm) {
+                $.post("@Url.Action("DeleteImage", "Admin")/" + $(this).data("cid"))
+                    .done(function (e) {
+                        if (e.success == "true") {
+                            messageBox("Delete Success");
+                            refreshList();
+                        } else {
+                            messageBox(e.message);
+                        }
+                    });
+            }
+        });
+        rebindAjaxGetPartial();
+    });
+</script>
+
+<table class="table table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Description</th>
+            <th scope="col"></th>
+            <th scope="col">Create DateTime</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    @foreach (Images img in Model.Image)
+    {
+<tr>
+        <td scope="col">@img.Description</td>
+        <td scope="col"><img src="@img.Path" height="100" /></td>
+        <td scope="col">@img.CreateDate.ToString("yyyy/MM/dd HH:mm:ss")</td>
+        <td scope="col">
+        <button type="button" class="btn btn-danger fa fa-remove btn-delete" stlye="margin-left: 40px" data-cid="@img.Id"></button>
+    </td>
+</tr>
+    }
+</table>
+
+<div class="row">
+    <button type="button" class="btn btn-success fa fa-plus get-partial" style="margin-left: 20px" href="/Admin/ImageEditor" target="data-modal-content" modal="data-modal"></button>
+</div>

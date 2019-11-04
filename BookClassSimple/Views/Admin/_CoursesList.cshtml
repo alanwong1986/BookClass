@@ -1,0 +1,54 @@
+﻿@model ManageCourseViewModel
+@{
+    Layout = null;
+}
+
+<script>
+    $(document).ready(function () {
+        $(".btn-delete").click(function () {
+            var confirm = window.confirm("Are you sure to delete?");
+            if (confirm) {
+                $.post("@Url.Action("DeleteCourse", "Admin")/" + $(this).data("cid"))
+                    .done(function (e) {
+                        if (e.success == "true") {
+                            messageBox("Delete Success");
+                            refreshList();
+                        } else {
+                            messageBox(e.message);
+                        }
+                    });
+            }
+        });
+        rebindAjaxGetPartial();
+    });
+</script>
+
+<table class="table table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Category</th>
+            <th scope="col">Name</th>
+            <th scope="col">Modify DateTime</th>
+            <th scope="col">Create DateTime</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    @foreach (Courses course in Model.Courses.OrderBy(c => c.Category.Name))
+    {
+        <tr>
+            <td scope="col">@course.Category.Name</td>
+            <td scope="col">@course.Name</td>
+            <td scope="col">@(course.LastModifty.HasValue ? course.LastModifty.Value.ToString("yyyy/MM/dd HH:mm:ss") : "")</td>
+            <td scope="col">@course.CreateDate.ToString("yyyy/MM/dd HH:mm:ss")</td>
+            <td scope="col">
+                <button type="button" class="btn btn-warning fa fa-calendar get-partial" stlye="margin-left: 40px" href="/Admin/CoursesScheduleEditor/@course.Id" target="data-modal-content" modal="data-modal"></button>
+                <button type="button" class="btn btn-primary fa fa-pencil get-partial" stlye="margin-left: 40px" href="/Admin/CoursesEditor/@course.Id" target="data-modal-content" modal="data-modal"></button>
+                <button type="button" class="btn btn-danger fa fa-remove btn-delete" stlye="margin-left: 40px" data-cid="@course.Id"></button>
+            </td>
+        </tr>
+    }
+</table>
+
+<div class="row">
+    <button type="button" class="btn btn-success fa fa-plus get-partial" style="margin-left: 20px" href="/Admin/CoursesEditor" target="data-modal-content" modal="data-modal"></button>
+</div>

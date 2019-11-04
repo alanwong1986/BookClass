@@ -1,0 +1,248 @@
+﻿@model CourseScheduleViewModel
+@{
+    Layout = null;
+}
+
+<script>
+    $(document).ready(function () {
+        var courseModel = @Html.Raw(Json.Serialize(Model));
+        var runningID = 60000;
+
+        $(".btn-save").click(function () {
+            console.log(JSON.stringify(courseModel));
+            $.post("@Url.Action("SaveCourseSchedule", "Admin")/", courseModel).done(function (result) {
+                if (result.success == "true") {
+                    $('#data-modal').modal('hide');
+                    messageBox("Record Saved");
+                } else {
+                    alert(result.message);
+                }
+            });
+        });
+
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        $(".schedule-picker").each(function () {
+            var calender = $("<table class='calender-table'>");
+            var timePicker = $("<div class='time-picker'>");
+            $(this).append(calender);
+            var today = new Date();
+            loadCalender(calender, timePicker, today.getFullYear(), today.getMonth());
+            $(this).append(timePicker);
+        });
+
+        function loadCalender(calender, timePicker, year, month) {
+            var calender_id = $(calender).attr("id");
+            $(timePicker).html('');
+
+            var today = new Date();
+            var daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            var headerRow = $("<thead class='calender-header'>");
+            var headerCell = $("<td colspan='7'><span class='calender-left' name='" + calender_id + "'><</span><span style='width:80%;display:inline-block'>" + year + " " + monthNames[month] + "</span><span class='calender-right' name='" + calender_id + "'>></></td>")
+            $(headerRow).append(headerCell);
+            $(calender).append(headerRow);
+
+            var weekRow = $("<tr>");
+            $(weekRow).append($("<td class='calender-week'>Sun</td><td class='calender-week'>Mon</td><td class='calender-week'>Tue</td><td class='calender-week'>Wed</td><td class='calender-week'>Thu</td><td class='calender-week'>Fri</td><td class='calender-week'>Sat</td>"));
+            $(calender).append(weekRow);
+
+            var curRow;
+            for (var day = 1; day <= daysInMonth; day++) {
+                var date = new Date(year, month, day);
+                if (day == 1 || date.getDay() == 0) {
+                    var curRow = $("<tr>");
+                    $(calender).append(curRow);
+                    if (day == 1) {
+                        if (date.getDay() != 0) {
+                            curRow.append($("<td class='calender-dummy' colspan='" + date.getDay() + "'>"));
+                        }
+                    }
+                }
+
+                var isSelectable = false;
+                for (var cd = 0; cd < courseModel.courseDate.length; cd++) {
+                    if (courseModel.courseDate[cd].action != 'del') {
+                        var selectableDate = new Date(courseModel.courseDate[cd].courseDate);
+                        if (selectableDate.getFullYear() == year && selectableDate.getMonth() == month && selectableDate.getDate() == day) {
+                            isSelectable = true;
+                        }
+                    }
+                }
+
+                if (isSelectable) {
+                    curRow.append($("<td class='calender-day calender-selectable' name='" + calender_id + "' value='" + year + "-" + month + "-" + day + "'>" + day + "</td>"));
+                } else if (today.getFullYear() == year && today.getMonth() == month && today.getDate() == day) {
+                    curRow.append($("<td class='calender-day calender-today' name='" + calender_id + "' value='" + year + "-" + month + "-" + day + "'>" + day + "</td>"));
+                } else {
+                    curRow.append($("<td class='calender-day' name='" + calender_id + "' value='" + year + "-" + month + "-" + day + "'>" + day + "</td>"));
+                }
+
+                if (day == daysInMonth) {
+                    if (date.getDay() != 6) {
+                        curRow.append($("<td class='calender-dummy' colspan='" + (6 - date.getDay()) + "'>"));
+                    }
+                }
+            }
+
+            $(".calender-left[name=" + calender_id + "]").click(function () {
+                $(calender).html('');
+                if (month == 0) {
+                    loadCalender(calender, timePicker, year - 1, 11);
+                } else {
+                    loadCalender(calender, timePicker, year, month - 1);
+                }
+            });
+
+            $(".calender-right[name=" + calender_id + "]").click(function () {
+                $(calender).html('');
+                if (month == 11) {
+                    loadCalender(calender, timePicker, year + 1, 1);
+                } else {
+                    loadCalender(calender, timePicker, year, month + 1);
+                }
+            });
+
+            $(".calender-day[name=" + calender_id + "]").click(function () {
+                $(timePicker).html('');
+                $(".calender-day[name=" + calender_id + "]").removeClass("calender-selected");
+                $(this).addClass("calender-selected");
+                var timePanel = $("<div id='time-panel' style='padding:15px'>");
+                $(timePicker).append(timePanel);
+
+                for (var cd = 0; cd < courseModel.courseDate.length; cd++) {
+                    if (courseModel.courseDate[cd].action != "del") {
+                        var selectableDate = new Date(courseModel.courseDate[cd].courseDate);
+                        
+                        if (selectableDate.getFullYear() == year && selectableDate.getMonth() == month && selectableDate.getDate() == $(this).html()) {
+                            for (var ct = 0; ct < courseModel.courseDate[cd].courseTimes.length; ct++) {
+                                var time = courseModel.courseDate[cd].courseTimes[ct];
+                                if (time.action != "del") {
+                                    $(timePanel).append($("<div><label>" + time.courseTime + "</label><button type='button' class='btn btn-danger fa fa-remove btn-time-delete' timeId='" + time.courseTimeId + "'></button></div>"))
+                                }
+                            }
+                        }   
+                    }
+                }
+                rebindDeleteButton($(".btn-time-delete"));
+            });
+        }
+
+        $('.btn-add-time').click(function () {
+                var selected = $(".calender-selected");
+                if (!selected.html()) {
+                    alert("Please Select a Date");
+                } else {
+                    var inputPanel = $("<div><input type='text' class='form-control col-lg-3' style='display:inline-block; margin-right:5px'/></div>");
+                    var button = $("<button type='button' class='btn btn-success fa fa fa-plus btn-time-confirm'></button>");
+                    $(button).click(function () {
+                        var input = $(this).closest('div').find('input').val();
+                        if (!validateTimeFormat(input)) {
+                            alert("Time must be in HH:mm:ss Format")
+                        } else {
+                            $(inputPanel).remove();
+                            var displayPanel = $("<div><label>" + input + "</label></div>");
+                            var deleteButton = $("<button type='button' class='btn btn-danger fa fa-remove btn-time-delete' timeId='" + runningID + "'></button>");
+                            $(displayPanel).append(deleteButton);
+                            $("#time-panel").append(displayPanel);
+                            rebindDeleteButton(deleteButton);
+                            var selectedYear = $(selected).attr('value').substring(0, 4);
+                            var selectedMonth = $(selected).attr('value').substring(5, 7);
+                            var selectedDay = $(selected).html();
+                            var Added = false;
+                            for (var cd = 0; cd < courseModel.courseDate.length; cd++) {
+                                var selectableDate = new Date(courseModel.courseDate[cd].courseDate);
+
+                                if (selectableDate.getFullYear() == selectedYear && selectableDate.getMonth() == selectedMonth && selectableDate.getDate() == selectedDay) {
+                                    if (courseModel.courseDate[cd].action == "del") {
+                                        courseModel.courseDate[cd].action = null;
+                                    }
+                                    courseModel.courseDate[cd].courseTimes.push(
+                                        { courseTimeId: runningID, courseTime: input, action: "add" }
+                                    );
+                                    Added = true;
+                                    runningID -= 1;
+                                };
+                            }
+
+                            if (!Added) {
+                                courseModel.courseDate.push(
+                                    { courseDate: selectedYear + "-" + (parseInt(selectedMonth) + 1) + "-" + selectedDay, courseDateId: 0, courseTimes: [{ courseTimeId: runningID, courseTime: input, action: "add" }], action: "add" });
+
+                                runningID -= 1;
+                                $(selected).addClass('calender-selectable');
+                            }
+                        }
+                    });
+                    $(inputPanel).append(button);
+                    $("#time-panel").append(inputPanel);
+
+                }
+            });
+
+        function validateTimeFormat(time) {
+            if (!time.match(/^\d{2}:\d{2}:\d{2}$/)) {
+                return false;
+            }
+            var hh = parseInt(time.substring(0, 2), 10);
+            var mm = parseInt(time.substring(3, 5), 10);
+            var ss = parseInt(time.substring(6), 10);
+            if (hh > 23 || mm > 59 || ss > 59) {
+                return false;
+            }
+            return true;
+        }
+
+        function rebindDeleteButton(btn) {
+            $(btn).click(function () {
+                for (var cd = 0; cd < courseModel.courseDate.length; cd++) {
+                    for (var ct = 0; ct < courseModel.courseDate[cd].courseTimes.length; ct++) {
+                        if (courseModel.courseDate[cd].courseTimes[ct].courseTimeId == $(this).attr("timeId")) {
+                            $(this).closest("div").remove();
+                            if (courseModel.courseDate[cd].courseTimes[ct].action == "add") {
+                                delete courseModel.courseDate[cd].courseTimes[ct];
+                                console.log("del1")
+                            } else {
+                                courseModel.courseDate[cd].courseTimes[ct].action = "del";
+                                console.log("del2")
+                            }
+                        }
+                    }
+                    if (courseModel.courseDate[cd].courseTimes.filter(d => d.action != 'del').length == 0) {
+                        if (courseModel.courseDate[cd].action == "add") {
+                            delete courseModel.courseDate[cd];
+                            console.log("del3")
+                        } else {
+                            courseModel.courseDate[cd].action = "del";
+                            console.log("del4")
+                        }
+                        var selectableDate = new Date(courseModel.courseDate[cd].courseDate);
+                        $(".calender-day[value=" + selectableDate.getFullYear() + "-" + selectableDate.getMonth() + "-" + selectableDate.getDate() + "]").removeClass("calender-selectable");
+                    }
+                }
+            });
+        }
+        });
+</script>
+
+<div class="modal-header">
+    <h5 class="modal-title data-model-title">Course Schedule</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<div class="modal-body data-modal-body">
+    <div class="container">
+        <form id="input_form">
+            <div class="schedule-picker" id="scheduleCalender"></div>
+            <span class='btn btn-success btn-add-time' style='width:100%; cursor:pointer'>Add Time</span>
+        </form>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary btn-save">Save</button>
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+</div>
