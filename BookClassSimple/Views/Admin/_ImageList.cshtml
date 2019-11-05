@@ -36,7 +36,7 @@
     {
 <tr>
         <td scope="col">@img.Description</td>
-        <td scope="col"><img src="@img.Path" height="100" /></td>
+        <td scope="col"><img src="@Url.Content("~" + img.Path)" height="100" /></td>
         <td scope="col">@img.CreateDate.ToString("yyyy/MM/dd HH:mm:ss")</td>
         <td scope="col">
         <button type="button" class="btn btn-danger fa fa-remove btn-delete" stlye="margin-left: 40px" data-cid="@img.Id"></button>

@@ -22,41 +22,41 @@
             <ul class="navbar-nav mr-auto">
                 @if (User.IsInRole("admin"))
                 {
-                    <li class="nav-item">
-                        @Html.ActionLink("Manage Categories", "ManageCategories", "Admin", null, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Manage Location", "ManageLocation", "Admin", null, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Manage Images", "ManageImages", "Admin", null, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Manage Courses", "ManageCourses", "Admin", null, new { @class = "nav-link" })
-                    </li>
+                <li class="nav-item">
+                    @Html.ActionLink("Manage Categories", "ManageCategories", "Admin", null, new { @class = "nav-link" })
+                </li>
+                <li class="nav-item">
+                    @Html.ActionLink("Manage Location", "ManageLocation", "Admin", null, new { @class = "nav-link" })
+                </li>
+                <li class="nav-item">
+                    @Html.ActionLink("Manage Images", "ManageImages", "Admin", null, new { @class = "nav-link" })
+                </li>
+                <li class="nav-item">
+                    @Html.ActionLink("Manage Courses", "ManageCourses", "Admin", null, new { @class = "nav-link" })
+                </li>
                 }
             </ul>
             <ul class="navbar-nav">
                 @if (User.Identity.IsAuthenticated)
                 {
-                    <li class="nav-item">
-                        <a class="nav-link">@User.Identity.Name</a>
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Bookings", "ListBooking", "Course", null, new { @class = "nav-link" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Logout", "UserLogout", "Account", null, new { @class = "nav-link" })
-                    </li>
+                <li class="nav-item">
+                    <a class="nav-link">@User.Identity.Name</a>
+                </li>
+                <li class="nav-item">
+                    @Html.ActionLink("Bookings", "ListBooking", "Course", null, new { @class = "nav-link" })
+                </li>
+                <li class="nav-item">
+                    @Html.ActionLink("Logout", "UserLogout", "Account", null, new { @class = "nav-link" })
+                </li>
                 }
                 else
                 {
-                    <li class="nav-item">
-                        @Html.ActionLink("Login", "Login", "Account", null, new { @class = "nav-link get-partial", target = "account-modal-content", modal = "account-modal" })
-                    </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Register", "Register", "Account", null, new { @class = "nav-link get-partial", target = "account-modal-content", modal = "account-modal" })
-                    </li>
+                <li class="nav-item">
+                    <a class="nav-link get-partial" href="/Account/Login" target="account-modal-content" modal="account-modal">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link get-partial" href="/Account/Register" target="account-modal-content" modal="account-modal">Register</a>
+                </li>
                 }
             </ul>
         </div>
@@ -82,6 +82,9 @@
 
     <partial name="_CookieConsentPartial" />
 
+    <script type="text/javascript">
+        var PageUrl = '@Url.Content("~")';
+    </script>
 
     <script src="~/lib/jquery/dist/jquery.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>

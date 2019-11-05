@@ -104,7 +104,7 @@
                         <div class="card">
                             <div class="image-container">
                                 <div class="price-tag">$@courseList[(i * 4) + j].Price</div>
-                                <img src="@courseList[(i * 4) + j].Image.Path">
+                                <img src="@(Url.Content("~" + courseList[(i * 4) + j].Image.Path))">
                             </div>
                             <div class="detail-container">
                                 <h3>

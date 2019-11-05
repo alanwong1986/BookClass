@@ -4,7 +4,7 @@
             if (errorThrown == "Unauthorized") {
                 messageBox("Please Login")
             } else { 
-                location.href = "/Home/Error";
+                location.href = PageUrl + "/Home/Error";
             }
         }
     });
@@ -21,7 +21,7 @@
 function rebindAjaxGetPartial() {
     $('.get-partial').on('click', function (e) {
         e.preventDefault();
-        var action = $(this).attr('href');
+        var action = PageUrl + $(this).attr('href');
         var fillTarget = $(this).attr('target');
         var modal = $(this).attr('modal');
 
@@ -38,12 +38,12 @@ function rebindAjaxGetPartial() {
 function rebindAjaxFormSubmit() {
     $('.ajax-form').submit(function (e) {
         e.preventDefault();
-        var action = $(this).attr('action');
+        var action = PageUrl + $(this).attr('action');
         var fillTarget = $(this).attr('target');
 
         $.post(action, $(this).serialize(), function (result) {
             if (result.href != undefined) {
-                location.href = result.href;
+                location.href = PageUrl + result.href;
             } else {
                 $('#' + fillTarget).html(result);
                 rebindAjaxFormSubmit();

@@ -90,11 +90,11 @@
                     {
                         if (Model.ImageId == img.Id)
                         {
-                            <img class="active" src="@img.Path" value="@img.Id" />
+                            <img class="active" src="@Url.Content("~" + img.Path)" value="@img.Id" />
                         }
                         else
                         {
-                            <img src="@img.Path" value="@img.Id" />
+                            <img src="@Url.Content("~" + img.Path)" value="@img.Id" />
                         }
                     }
                 </div>
