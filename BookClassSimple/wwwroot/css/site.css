@@ -58,6 +58,8 @@ body {
     width: 100%;
     overflow: hidden;
     background-color: black;
+    position:absolute;
+    top:0px;
 }
 
 .cover::before {
@@ -69,11 +71,14 @@ body {
     left: 0px;
     height: 100%;
     width: 100%;
+    z-index:1;
 }
 
 .cover video {
     min-width: 100%;
     min-height: 100%;
+    position:absolute;
+    top:50px;
 }
 
 .cover-panel {
@@ -82,6 +87,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
+    z-index:2;
 }
 
 .cover-panel > div {
