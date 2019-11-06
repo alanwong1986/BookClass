@@ -45,6 +45,11 @@
             $("#cat-nav").removeClass("fixed-top");
             $("#CourseListContainer").css('margin-top', '0px');
         }
+        if (windowScroll + $("#nav-main").outerHeight() > carNavPosY) {
+            $("#cat-nav").css("z-index", '3');
+        } else if ($("#cat-nav").css("z-index") == '3') {
+            $("#cat-nav").css("z-index", '1');
+        }
     })
 </script>
 

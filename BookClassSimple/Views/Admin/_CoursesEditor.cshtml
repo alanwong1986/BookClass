@@ -81,11 +81,8 @@
             </div>
             <br />
             <div class="row">
-                <span class="col-lg-3">
-                    @Html.LabelFor(c => c.ImageId)
-                </span>
                 @Html.HiddenFor(c => c.ImageId)
-                <div class='image-selector col-lg-9'>
+                <div class='image-selector col-lg-12'>
                     @foreach (var img in (List<Images>)ViewData["ImageList"])
                     {
                         if (Model.ImageId == img.Id)
